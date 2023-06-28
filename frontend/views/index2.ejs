@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nUSD</title>
+</head>
+<body>
+    <h1>nUSD Stable Coin</h1>
+    <div>
+        Total Supply 
+        <h1 id="result"></h1>
+    </div>
+    <div>
+        <input type="text" id="etherInput" placeholder="Enter Value in WEI">
+        <button id="buyButton">Buy Tokens</button>
+    </div>
+    <div>
+        <input type="text" id="burnInput" placeholder="Enter Number of Tokens to Burn">
+        <button id="burnButton">Burn Tokens</button>
+    </div>
+    <script>
+        const transactionParameters = {
+            to: "0x6255581A224c8f1195d60e08717AcaD7f1269567", 
+            from: "", 
+            data: "0xa4821719",
+            value: "0x2386f26fc10000",
+        };
+        const transactionParameters2 ={
+            to: "0x6255581A224c8f1195d60e08717AcaD7f1269567",
+            from: "",
+            data:"0x4f3e1efc"
+        }
+        const transactionParameters3={
+            to: "0x6255581A224c8f1195d60e08717AcaD7f1269567",
+            from: "",
+            data:"0xa6e158f8"
+        }
+
+        const executeTransaction = async () => {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const currentAddress = accounts[0];
+                transactionParameters.from = currentAddress;
+                const weiValue = document.getElementById("etherInput").value;
+        const hexValue = "0x" + BigInt(weiValue).toString(16); // Convert wei to hexadecimal
+        transactionParameters.value = hexValue;
+                
+                const txHash = await window.ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [transactionParameters],
+                });
+                console.log("Transaction hash:", txHash);
+            } catch (error) {
+                console.error("Transaction error:", error);
+            }
+        };
+
+        document.getElementById("buyButton").addEventListener("click", executeTransaction);
+
+        const executeViewTransaction = async () => {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const currentAddress = accounts[0];
+                transactionParameters2.from = currentAddress;
+
+                const result = await window.ethereum.request({
+                    method: "eth_call",
+                    params: [transactionParameters2],
+                });
+                console.log("Transaction result:", result);
+                const decimalResult = parseInt(result, 16).toString();
+                document.getElementById("result").textContent = decimalResult;
+            } catch (error) {
+                console.error("Transaction error:", error);
+            }
+        };
+
+        const executeBurnTransaction = async () => {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const currentAddress = accounts[0];
+                transactionParameters3.from = currentAddress;
+                const burnValue = document.getElementById("burnInput").value;
+                const paddedBurnValue = BigInt(burnValue).toString(16).padStart(64, "0");
+                transactionParameters3.data += paddedBurnValue;
+                
+                const txHash = await window.ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [transactionParameters3],
+                });
+                console.log("Transaction hash:", txHash);
+            } catch (error) {
+                console.error("Transaction error:", error);
+            }
+        };
+
+        document.getElementById("burnButton").addEventListener("click", executeBurnTransaction);
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            try {
+                await window.ethereum.enable();
+                executeViewTransaction();
+            } catch (error) {
+                console.error("MetaMask connection error:", error);
+            }
+        });
+    </script>
+</body>
+</html>
