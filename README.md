@@ -1,4 +1,4 @@
-# nUSD Stablr Coin
+# nUSD Stable Coin
 
 -- Server and Client files in frontend
 
